@@ -103,7 +103,6 @@ $(document).ready(function() {
 
 	$("#city_dd").off("change");
     $("#city_dd").on("change", function(){
-        console.log(this.value);
         set_selected_city_label('You have selected City: ' + this.value, 'green')
     });
 

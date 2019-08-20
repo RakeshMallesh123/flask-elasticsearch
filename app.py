@@ -58,9 +58,14 @@ def get_city():
         return jsonify({"error": True, "message": "No city data present for state - " + state}), 200
 
 
-@app.route("/crud")
-def crud():
-    return render_template("crud.html")
+@app.route("/country")
+def country():
+    country_data = es.search(index='my_country_index_3', body={'query': {"match": {"_type": "country"}}},
+              filter_path=['hits.hits._id', 'hits.hits._source'])
+    country = []
+    if 'hits' in country_data and 'hits' in country_data['hits']:
+        countries = [{"id":data["_id"], "name":data["_source"]["name"]} for data in country_data['hits']['hits']]
+    return render_template("crud/country/list.html", countries=countries)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,27 @@
+{% extends "base.html" %} {% block content %}
+<h2 class="title">
+    Country
+</h2>
+<!--<script src="{{ url_for('static', filename='js/datatables.js') }}"></script>-->
+<div style="overflow-x: scroll">
+    <table id="dtBasicExample" class="table table-hover" cellspacing="0" width="100%">
+        <thead align="center">
+            <tr>
+                <th class="th-sm">Id</th>
+                <th class="th-sm">Name</th>
+                <th class="th-sm">Action</th>
+            </tr>
+        </thead>
+        <tbody align="center">
+            {%for data in countries%}
+            <tr>
+                <td>{{data["id"]}}</td>
+                <td>{{data["name"]}}</td>
+                <td><i class='fas fa-pen'></i></td>
+            </tr>
+            {%endfor%}
+        </tbody>
+    </table>
+</div>
+<br>
+<br> {% endblock %}
