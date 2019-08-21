@@ -1,8 +1,11 @@
-from builtins import object, classmethod, int
+from builtins import classmethod, int
 from datetime import datetime
 
 
-class Country(object):
+class Country:
+    def __init__(self):
+        pass
+
     @classmethod
     def get_countries(cls, es):
         country_data = es.search(index='my_country_index_3',
@@ -14,9 +17,27 @@ class Country(object):
         return countries
 
     @classmethod
+    def get_country(cls, id, es):
+        country_data = es.search(index='my_country_index_3',
+                                 body={'query': {"bool": {"must": [{"match": {"_type": "country"}},
+                                                                   {'match': {'_id': id}}
+                                                                   ]}}})
+        if 'hits' in country_data and 'hits' in country_data['hits']:
+            return {"id": country_data['hits']['hits'][0]['_id'],
+                    "name": country_data['hits']['hits'][0]["_source"]["name"]}
+        return False
+
+    @classmethod
     def create_country(cls, name, es):
         id = int(datetime.timestamp(datetime.now()) * 1000)
         res = es.index(index='my_country_index_3', doc_type='country', id=id, body={"name": name})
         if "result" in res and res["result"] == "created":
+            return True
+        return False
+
+    @classmethod
+    def edit_country(cls, id, name, es):
+        res = es.index(index='my_country_index_3', doc_type='country', id=id, body={"name": name})
+        if "result" in res and res["result"] == "updated":
             return True
         return False

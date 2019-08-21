@@ -5,7 +5,7 @@ from flask import Flask, render_template, request, jsonify, flash, redirect, url
 from elasticsearch import Elasticsearch
 from flask_bootstrap import Bootstrap
 
-from forms.country import CountryForm
+from forms.country import CountryForm, EditCountryForm
 from models.country import Country
 from models.state import State
 from models.city import City
@@ -80,31 +80,33 @@ def country_create():
             else:
                 flash('Unable to create country.')
                 return render_template('crud/country/create.html', form=country_form)
-    elif request.method == 'GET':
+    else:
         return render_template('crud/country/create.html', form=country_form)
-
-    return render_template("crud/country/create.html", form=country_form)
 
 
 @app.route("/country/edit/<id>", methods=['GET', 'POST'])
 def country_edit(id):
     print(id)
-    country_form = CountryForm()
+    country_form = EditCountryForm()
     if request.method == 'POST':
         if not country_form.validate():
             flash('All fields are required.')
-            return render_template('crud/country/create.html', form=country_form)
+            return render_template('crud/country/edit.html', form=country_form)
         else:
-            result = create_country(request.form["name"])
+            result = Country.edit_country(request.form["id"], request.form["name"], es)
             if result:
-                flash('Country created successfully!!!')
+                flash('Country edited successfully!!!')
                 return redirect(url_for('country'))
             else:
-                flash('Unable to create country.')
-                return render_template('crud/country/create.html', form=country_form)
-    elif request.method == 'GET':
-        return render_template('crud/country/create.html', form=country_form)
-    return render_template("crud/country/create.html", form=country_form)
+                flash('Unable to edit country.')
+                return render_template('crud/country/edit.html', form=country_form)
+    else:
+        country = Country.get_country(id, es)
+        if not country:
+            return redirect(url_for('country'))
+        country_form.name.data = country["name"]
+        country_form.id.data = country["id"]
+        return render_template('crud/country/edit.html', form=country_form)
 
 
 if __name__ == "__main__":

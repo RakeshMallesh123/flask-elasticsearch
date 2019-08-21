@@ -4,7 +4,7 @@
 <div class="row">
     <div class="col-xs-8 col-sm-8 col-md-9 col-lg-10">
         <h2 class="title">
-            Create Country
+            Edit Country
         </h2>
     </div>
 </div>
@@ -13,12 +13,13 @@
     <div>{{ message }}</div>
 {% endfor %}
 
-<form action = "{{ url_for('country_create') }}" method = post>
+<form action = "{{ url_for('country_edit', id=form.id) }}" method = post>
     <fieldset>
         {{ form.hidden_tag() }}
         <div class="row">
             <div class="col-sm-12">{{ wtf.form_field(form.name) }}</div>
-            <div class="col-sm-12"> <input type="submit" class="btn btn-primary" value="Create"></div>
+            <div class="col-sm-12" style="display:none">{{ wtf.form_field(form.id) }}</div>
+            <div class="col-sm-12"> <input type="submit" class="btn btn-primary" value="Save"></div>
         </div>
     </fieldset>
 </form>

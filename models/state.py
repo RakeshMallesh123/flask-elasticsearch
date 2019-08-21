@@ -1,7 +1,10 @@
-from builtins import object, classmethod
+from builtins import classmethod
 
 
-class State(object):
+class State:
+    def __init__(self):
+        pass
+
     @classmethod
     def get_states(cls, country, es):
         state_data = es.search(
