@@ -1,4 +1,4 @@
 $(document).ready(function() {
-    $('#dtBasicExample').DataTable();
+    $('#datatable-country').DataTable();
     $('.dataTables_length').addClass('bs-select');
 });

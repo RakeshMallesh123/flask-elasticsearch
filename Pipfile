@@ -8,6 +8,8 @@ pylint = "*"
 
 [packages]
 Flask = "*"
+flask-WTF = "*"
+flask-bootstrap = "*"
 elasticsearch="*"
 
 [requires]

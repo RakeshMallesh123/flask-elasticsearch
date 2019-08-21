@@ -20,7 +20,7 @@ $(document).ready(function() {
             else {
                 if (data.country != undefined) {
                     $.each(data.country, function(index, value){
-                        $('#country_dd').append(new Option(value, value));
+                        $('#country_dd').append(new Option(value.name, value.name));
                     })
                 }
                 set_selected_city_label('Select Country')
@@ -54,7 +54,7 @@ $(document).ready(function() {
                 else {
                     if (data.state != undefined) {
                         $.each(data.state, function(index, value){
-                            $('#state_dd').append(new Option(value, value));
+                            $('#state_dd').append(new Option(value.name, value.name));
                         })
                     }
                     set_selected_city_label('Select State')
@@ -89,7 +89,7 @@ $(document).ready(function() {
                 else {
                     if (data.city != undefined) {
                         $.each(data.city, function(index, value){
-                            $('#city_dd').append(new Option(value, value));
+                            $('#city_dd').append(new Option(value.name, value.name));
                         })
                     }
                     set_selected_city_label('Select City')
