@@ -217,7 +217,6 @@ def city_edit(id, state):
         city = City.get(id)
         if not city:
             return redirect(url_for('state'))
-        print(city)
         city_form.name.data = city["name"]
         city_form.state.data = city["parent"]
         city_form.id.data = city["id"]
