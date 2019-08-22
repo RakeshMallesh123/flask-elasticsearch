@@ -69,7 +69,7 @@ class State:
     def edit(cls, id, name, country):
         country_rec = Country.get(country)
         if country_rec:
-            res = es.update(index=os.environ.get("INDEX"), doc_type='state', id=id, parent=country_rec["id"],
+            res = es.index(index=os.environ.get("INDEX"), doc_type='state', id=id, parent=country_rec["id"],
                            body={"name": name, "country": country_rec["name"]})
             if "result" in res and res["result"] == "updated":
                 return True

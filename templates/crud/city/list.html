@@ -46,15 +46,16 @@
                     <a href="{{ url_for('city_edit', id=data['id'], state=data['parent']) }}">
                         <i class='fas fa-pen'></i>
                     </a>
-                    <form action = "{{url_for('city_delete', id=data['id'], state=data['parent']) }}" method="POST">
-                        <button type="submit" class=""><i class='fas fa-trash'></i></button>
+                    <form action = "{{url_for('city_delete', id=data['id'], state=data['parent']) }}" method="POST" style="display: inline;">
+                        <button type="submit" class="btn">
+                            <i class='fas fa-trash' style="color: red"></i>
+                        </button>
                     </form>
                 </td>
             </tr>
             {%endfor%}
         </tbody>
     </table>
-
 </div>
 <br>
 <br>

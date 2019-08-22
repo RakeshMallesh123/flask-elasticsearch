@@ -44,8 +44,10 @@
                     <a href="{{ url_for('country_edit', id=data['id']) }}">
                         <i class='fas fa-pen'></i>
                     </a>
-                    <form action = "{{url_for('country_delete', id=data['id'])}}" method="POST">
-                        <button type="submit" class=""><i class='fas fa-trash'></i></button>
+                    <form action = "{{url_for('country_delete', id=data['id'])}}" method="POST" style="display: inline;">
+                        <button type="submit" class="btn">
+                            <i class='fas fa-trash' style="color: red"></i>
+                        </button>
                     </form>
                 </td>
             </tr>
