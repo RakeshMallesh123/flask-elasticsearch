@@ -33,7 +33,7 @@ class State:
         states = []
         if 'hits' in state_data and 'hits' in state_data['hits']:
             states = [
-                {"id": data["_id"], "name": data["_source"]["name"], "parent": data["_parent"],
+                {"id": data["_id"], "name": data["_source"]["name"]+" - "+data["_parent"], "parent": data["_parent"],
                  "country": data["_source"]["country"]}
                 for data in state_data['hits']['hits']
                 if "_parent" in data

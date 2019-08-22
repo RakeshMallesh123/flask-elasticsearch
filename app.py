@@ -4,6 +4,7 @@ from builtins import int, len
 from flask import Flask, render_template, request, jsonify, flash, redirect, url_for
 from flask_bootstrap import Bootstrap
 
+from forms.city import CityForm, EditCityForm
 from forms.country import CountryForm, EditCountryForm
 from forms.state import StateForm, EditStateForm
 from models.country import Country
@@ -156,6 +157,57 @@ def state_edit(id, country):
         state_form.id.data = state["id"]
         state_form.country_id.data = country
         return render_template('crud/state/edit.html', form=state_form)
+
+
+@app.route("/city", methods=['GET'])
+def city():
+    return render_template("crud/city/list.html", cities=City.get_cities(""))
+
+
+@app.route("/city/create", methods=['GET', 'POST'])
+def city_create():
+    city_form = CityForm()
+    if request.method == 'POST':
+        if not city_form.validate():
+            flash('All fields are required.')
+            return render_template('crud/city/create.html', form=city_form)
+        else:
+            result = City.create_city(request.form["name"], request.form["state"])
+            if result:
+                flash('City created successfully!!!')
+                return redirect(url_for('city'))
+            else:
+                flash('Unable to create city.')
+                return render_template('crud/city/create.html', form=city_form)
+    else:
+        return render_template('crud/city/create.html', form=city_form)
+
+
+@app.route("/city/edit/<id>/<state>", methods=['GET', 'POST'])
+def city_edit(id, state):
+    city_form = EditCityForm()
+    if request.method == 'POST':
+        if not city_form.validate():
+            flash('All fields are required.')
+            return render_template('crud/city/edit.html', form=city_form)
+        else:
+            result = City.edit_city(request.form["id"], request.form["name"], request.form["state"])
+            if result:
+                flash('City edited successfully!!!')
+                return redirect(url_for('city'))
+            else:
+                flash('Unable to edit city.')
+                return render_template('crud/city/edit.html', form=city_form)
+    else:
+        city = City.get_city(id)
+        if not city:
+            return redirect(url_for('state'))
+        print(city)
+        city_form.name.data = city["name"]
+        city_form.state.data = city["parent"]
+        city_form.id.data = city["id"]
+        city_form.state_id.data = city["parent"]
+        return render_template('crud/city/edit.html', form=city_form)
 
 
 if __name__ == "__main__":

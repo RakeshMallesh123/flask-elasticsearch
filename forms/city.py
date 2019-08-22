@@ -3,13 +3,16 @@ from wtforms import TextField, IntegerField, TextAreaField, SubmitField, RadioFi
 
 from wtforms import validators, ValidationError
 
+from models.state import State
+
 
 class CityForm(FlaskForm):
     name = TextField("Name", [validators.Required("Please enter city name.")])
-    state = TextField("State", [validators.Required("Please enter state name.")])
+    state = SelectField("State", choices=[(data['id'], data['name']) for data in State.get_states("")])
 
 
 class EditCityForm(FlaskForm):
-    id = TextField("Id", [validators.Required("Please enter id of country.")])
+    id = TextField("Id", [validators.Required("Please enter id of city.")])
     name = TextField("Name", [validators.Required("Please enter city name.")])
-    state = TextField("State", [validators.Required("Please enter state name.")])
+    state = SelectField("State", choices=[(data['id'], data['name']) for data in State.get_states("")])
+    state_id = TextField("State Id", [validators.Required("Please enter id of state.")])

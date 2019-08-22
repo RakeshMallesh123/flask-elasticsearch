@@ -13,12 +13,13 @@
     <div>{{ message }}</div>
 {% endfor %}
 
-<form action = "{{ url_for('city_edit', id=form.id) }}" method = post>
+<form action = "{{ url_for('city_edit', id=form.id, state=form.state_id) }}" method = post>
     <fieldset>
         {{ form.hidden_tag() }}
         <div class="row">
             <div class="col-sm-12">{{ wtf.form_field(form.name) }}</div>
             <div class="col-sm-12">{{ wtf.form_field(form.state) }}</div>
+            <div class="col-sm-12" style="display:none">{{ wtf.form_field(form.state_id) }}</div>
             <div class="col-sm-12" style="display:none">{{ wtf.form_field(form.id) }}</div>
             <div class="col-sm-12"> <input type="submit" class="btn btn-primary" value="Save"></div>
         </div>
