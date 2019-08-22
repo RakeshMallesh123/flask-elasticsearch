@@ -1,12 +1,14 @@
 from builtins import classmethod
 
+from es import es
+
 
 class City:
     def __init__(self):
         pass
 
     @classmethod
-    def get_cities(cls, state, es):
+    def get_cities(cls, state):
         city_data = es.search(
             index='my_country_index_3',
             body={
