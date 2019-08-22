@@ -1,3 +1,4 @@
+import os
 from builtins import classmethod, int
 from datetime import datetime
 from es import es
@@ -8,8 +9,8 @@ class Country:
         pass
 
     @classmethod
-    def get_countries(cls):
-        country_data = es.search(index='my_country_index_3',
+    def list(cls):
+        country_data = es.search(index=os.environ.get("INDEX"),
                                  body={'size': 10000, 'query': {"match": {"_type": "country"}}},
                                  filter_path=['hits.hits._id', 'hits.hits._source'])
         countries = []
@@ -18,8 +19,8 @@ class Country:
         return countries
 
     @classmethod
-    def get_country(cls, id):
-        country_data = es.search(index='my_country_index_3',
+    def get(cls, id):
+        country_data = es.search(index=os.environ.get("INDEX"),
                                  body={'query': {"bool": {"must": [{"match": {"_type": "country"}},
                                                                    {'match': {'_id': id}}
                                                                    ]}}})
@@ -29,16 +30,25 @@ class Country:
         return False
 
     @classmethod
-    def create_country(cls, name):
+    def create(cls, name):
         id = int(datetime.timestamp(datetime.now()) * 1000)
-        res = es.index(index='my_country_index_3', doc_type='country', id=id, body={"name": name})
+        res = es.index(index=os.environ.get("INDEX"), doc_type='country', id=id, body={"name": name})
         if "created" in res and res["created"]:
             return True
         return False
 
     @classmethod
     def edit_country(cls, id, name):
-        res = es.index(index='my_country_index_3', doc_type='country', id=id, body={"name": name})
+        res = es.index(index=os.environ.get("INDEX"), doc_type='country', id=id, body={"name": name})
         if "result" in res and res["result"] == "updated":
             return True
+        return False
+
+    @classmethod
+    def delete(cls, id):
+        country_rec = Country.get(id)
+        if country_rec:
+            res = es.delete(index=os.environ.get("INDEX"), doc_type='country', id=id)
+            if "found" in res and res["found"] and "result" in res and res["result"] == "deleted":
+                return True
         return False

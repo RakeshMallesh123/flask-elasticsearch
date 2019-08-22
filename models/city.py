@@ -1,3 +1,4 @@
+import os
 from builtins import classmethod, int
 from datetime import datetime
 
@@ -10,10 +11,10 @@ class City:
         pass
 
     @classmethod
-    def get_cities(cls, state):
+    def list(cls, state):
         if state != "":
             city_data = es.search(
-                index='my_country_index_3',
+                index=os.environ.get("INDEX"),
                 body={
                     'size': 10000,
                     'query': {"bool": {"must": [{"match": {"_type": "city"}}, {"match": {"state": state}}]}}
@@ -22,7 +23,7 @@ class City:
             )
         else:
             city_data = es.search(
-                index='my_country_index_3',
+                index=os.environ.get("INDEX"),
                 body={
                     'size': 10000,
                     'query': {"match": {"_type": "city"}}
@@ -40,9 +41,9 @@ class City:
         return cities
 
     @classmethod
-    def get_city(cls, id):
-        city_data = es.search(index='my_country_index_3',
-                                 body={'query': {"bool": {"must": [{"match": {"_type": "city"}},
+    def get(cls, id):
+        city_data = es.search(index=os.environ.get("INDEX"),
+                              body={'query': {"bool": {"must": [{"match": {"_type": "city"}},
                                                                    {'match': {'_id': id}},
                                                                    ]}}})
         if 'hits' in city_data and 'hits' in city_data['hits']:
@@ -53,23 +54,31 @@ class City:
         return False
 
     @classmethod
-    def create_city(cls, name, state):
-        state_rec = State.get_state(state)
+    def create(cls, name, state):
+        state_rec = State.get(state)
         if state_rec:
             id = int(datetime.timestamp(datetime.now()) * 1000)
             body = {"name": name, "state": state_rec["name"]}
-            res = es.index(index='my_country_index_3', doc_type='city', id=id, parent=state_rec["id"], body=body)
+            res = es.index(index=os.environ.get("INDEX"), doc_type='city', id=id, parent=state_rec["id"], body=body)
             if "created" in res and res["created"]:
                 return True
         return False
 
     @classmethod
-    def edit_city(cls, id, name, state):
-        state_rec = State.get_state(state)
+    def edit(cls, id, name, state):
+        state_rec = State.get(state)
         if state_rec:
-            res = es.index(index='my_country_index_3', doc_type='city', id=id, parent=state_rec["id"],
+            res = es.index(index=os.environ.get("INDEX"), doc_type='city', id=id, parent=state_rec["id"],
                            body={"name": name, "state": state_rec["name"]})
-            print(res)
             if "result" in res and res["result"] == "updated":
+                return True
+        return False
+
+    @classmethod
+    def delete(cls, id, state):
+        city_rec = City.get(id)
+        if city_rec:
+            res = es.delete(index=os.environ.get("INDEX"), doc_type='city', id=id, parent=state)
+            if "found" in res and res["found"] and "result" in res and res["result"] == "deleted":
                 return True
         return False

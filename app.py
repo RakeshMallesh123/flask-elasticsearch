@@ -1,5 +1,5 @@
 import os
-from builtins import int, len
+from builtins import len
 
 from flask import Flask, render_template, request, jsonify, flash, redirect, url_for
 from flask_bootstrap import Bootstrap
@@ -11,7 +11,6 @@ from models.country import Country
 from models.state import State
 from models.city import City
 
-from es import es
 
 app = Flask(__name__)
 Bootstrap(app)
@@ -30,7 +29,7 @@ def dd():
 
 @app.route("/get_country", methods=['GET'])
 def get_country():
-    country_data = Country.get_countries()
+    country_data = Country.list()
     if len(country_data) > 0:
         return jsonify({"country": country_data}), 200
     else:
@@ -42,7 +41,7 @@ def get_state():
     country = request.args.get("country", type=str)
     if not country:
         return jsonify({"message": "Please set the country field"}), 400
-    state_data = State.get_states(country)
+    state_data = State.list(country)
     if len(state_data) > 0:
         return jsonify({"state": state_data}), 200
     else:
@@ -54,7 +53,7 @@ def get_city():
     state = request.args.get("state", type=str)
     if not state:
         return jsonify({"message": "Please set the state field"}), 400
-    city_data = City.get_cities(state)
+    city_data = City.list(state)
     if len(city_data) > 0:
         return jsonify({"city": city_data}), 200
     else:
@@ -63,7 +62,7 @@ def get_city():
 
 @app.route("/country", methods=['GET'])
 def country():
-    return render_template("crud/country/list.html", countries=Country.get_countries())
+    return render_template("crud/country/list.html", countries=Country.list())
 
 
 @app.route("/country/create", methods=['GET', 'POST'])
@@ -74,7 +73,7 @@ def country_create():
             flash('All fields are required.')
             return render_template('crud/country/create.html', form=country_form)
         else:
-            result = Country.create_country(request.form["name"])
+            result = Country.create(request.form["name"])
             if result:
                 flash('Country created successfully!!!')
                 return redirect(url_for('country'))
@@ -101,7 +100,7 @@ def country_edit(id):
                 flash('Unable to edit country.')
                 return render_template('crud/country/edit.html', form=country_form)
     else:
-        country = Country.get_country(id)
+        country = Country.get(id)
         if not country:
             return redirect(url_for('country'))
         country_form.name.data = country["name"]
@@ -109,9 +108,17 @@ def country_edit(id):
         return render_template('crud/country/edit.html', form=country_form)
 
 
+@app.route("/counrty/delete/<id>", methods=['POST'])
+def country_delete(id):
+    result = Country.delete(id)
+    if result:
+        flash('Country deleted successfully!!!')
+    return redirect(url_for('country'))
+
+
 @app.route("/state", methods=['GET'])
 def state():
-    return render_template("crud/state/list.html", states=State.get_states(""))
+    return render_template("crud/state/list.html", states=State.list(""))
 
 
 @app.route("/state/create", methods=['GET', 'POST'])
@@ -122,7 +129,7 @@ def state_create():
             flash('All fields are required.')
             return render_template('crud/state/create.html', form=state_form)
         else:
-            result = State.create_state(request.form["name"], request.form["country"])
+            result = State.create(request.form["name"], request.form["country"])
             if result:
                 flash('State created successfully!!!')
                 return redirect(url_for('state'))
@@ -141,7 +148,7 @@ def state_edit(id, country):
             flash('All fields are required.')
             return render_template('crud/state/edit.html', form=state_form)
         else:
-            result = State.edit_state(request.form["id"], request.form["name"], request.form["country"])
+            result = State.edit(request.form["id"], request.form["name"], request.form["country"])
             if result:
                 flash('State edited successfully!!!')
                 return redirect(url_for('state'))
@@ -149,7 +156,7 @@ def state_edit(id, country):
                 flash('Unable to edit state.')
                 return render_template('crud/state/edit.html', form=state_form)
     else:
-        state = State.get_state(id)
+        state = State.get(id)
         if not state:
             return redirect(url_for('state'))
         state_form.name.data = state["name"]
@@ -159,9 +166,17 @@ def state_edit(id, country):
         return render_template('crud/state/edit.html', form=state_form)
 
 
+@app.route("/state/delete/<id>/<country>", methods=['POST'])
+def state_delete(id, country):
+    result = State.delete(id, country)
+    if result:
+        flash('State deleted successfully!!!')
+    return redirect(url_for('state'))
+
+
 @app.route("/city", methods=['GET'])
 def city():
-    return render_template("crud/city/list.html", cities=City.get_cities(""))
+    return render_template("crud/city/list.html", cities=City.list(""))
 
 
 @app.route("/city/create", methods=['GET', 'POST'])
@@ -172,7 +187,7 @@ def city_create():
             flash('All fields are required.')
             return render_template('crud/city/create.html', form=city_form)
         else:
-            result = City.create_city(request.form["name"], request.form["state"])
+            result = City.create(request.form["name"], request.form["state"])
             if result:
                 flash('City created successfully!!!')
                 return redirect(url_for('city'))
@@ -191,7 +206,7 @@ def city_edit(id, state):
             flash('All fields are required.')
             return render_template('crud/city/edit.html', form=city_form)
         else:
-            result = City.edit_city(request.form["id"], request.form["name"], request.form["state"])
+            result = City.edit(request.form["id"], request.form["name"], request.form["state"])
             if result:
                 flash('City edited successfully!!!')
                 return redirect(url_for('city'))
@@ -199,7 +214,7 @@ def city_edit(id, state):
                 flash('Unable to edit city.')
                 return render_template('crud/city/edit.html', form=city_form)
     else:
-        city = City.get_city(id)
+        city = City.get(id)
         if not city:
             return redirect(url_for('state'))
         print(city)
@@ -208,6 +223,14 @@ def city_edit(id, state):
         city_form.id.data = city["id"]
         city_form.state_id.data = city["parent"]
         return render_template('crud/city/edit.html', form=city_form)
+
+
+@app.route("/city/delete/<id>/<state>", methods=['POST'])
+def city_delete(id, state):
+    result = City.delete(id, state)
+    if result:
+        flash('City deleted successfully!!!')
+    return redirect(url_for('city'))
 
 
 if __name__ == "__main__":
