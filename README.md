@@ -17,4 +17,6 @@ Step 4 - Install flask environment
 
 By default the app has debug mode on
 
+Each new record is assigned with an unique id as timestamp in milli seconds
+
 Link to app http://localhost:5005/
